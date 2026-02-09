@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Portfolio</title>
+</head>
+<body>
+    <h1>{{username}}'s Personal Portfolio</h1>
+    {%if not holdings%}
+    <h2>No Holdings Yet...</h2>
+    {%endif%}
+    {% for holding in holdings %}
+    <div>
+    <h3>{{holding.name}}-{{holding.symbol}}</h3>
+    <p>Type: {{holding.type}}</p>
+    <p>Quantity: {{holding.quantity}}</p>
+    <p>Bought at: ${{holding.purchase_price}}</p>
+    <p>Purchase date: {{holding.date_added}}</p>
+    <p>Current Price: ${{holding.current_price}}</p>
+    {%if holding.percentage >= 0%}
+    <p>Gain: {{holding.percentage_abs}}%</p>
+    {%else%}
+    <p>Loss: {{holding.percentage_abs}}%</p>
+    {%endif%}
+    </div>
+    {% endfor %}
+</body>
+</html>
