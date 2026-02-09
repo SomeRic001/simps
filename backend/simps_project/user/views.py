@@ -34,7 +34,7 @@ def login(request):
             request.session.set_expiry(0)
         
         #redirect to dashboard
-        return redirect("users:landing")
+        return redirect("portfolio:index")
     return render(request,"user/login.html")
 
 def signup(request):
