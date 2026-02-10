@@ -1,30 +1,55 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Portfolio</title>
+    <link rel="stylesheet" href="{% static 'dist/style.css'%}">
 </head>
 <body>
-    <h1>{{username}}'s Personal Portfolio</h1>
+    <h1 class = "text-5xl" >{{username}}'s Personal Portfolio</h1>
     {%if not holdings%}
     <h2>No Holdings Yet...</h2>
-    {%endif%}
-    {% for holding in holdings %}
-    <div>
-    <h3>{{holding.name}}-{{holding.symbol}}</h3>
-    <p>Type: {{holding.type}}</p>
-    <p>Quantity: {{holding.quantity}}</p>
-    <p>Bought at: ${{holding.purchase_price}}</p>
-    <p>Purchase date: {{holding.date_added}}</p>
-    <p>Current Price: ${{holding.current_price}}</p>
-    {%if holding.percentage >= 0%}
-    <p>Gain: {{holding.percentage_abs}}%</p>
     {%else%}
-    <p>Loss: {{holding.percentage_abs}}%</p>
-    {%endif%}
-    </div>
+    <table class = "table-auto border-gray-600 w-full">
+        <thead class = "border-b-2 border-gray-300">
+            <tr> 
+                <th scope = "col" class=" px-4 py-3 text-left">Symbol</th>
+                <th scope = "col" class="px-4 py-3 text-left">Type</th>
+                <th scope = "col" class="px-4 py-3 text-left">Quantity</th>
+                <th scope = "col" class="px-4 py-3 text-left">Purchase Price</th>
+                <th scope = "col" class="px-4 py-3 text-left">Current Price</th>
+                <th scope = "col" class="px-4 py-3 text-left">Gain/Loss</th>
+                <th scope = "col" class="px-4 py-3 text-left">Action</th>
+            </tr>
+        </thead>
+    {% for holding in holdings %}
+        <tbody>
+            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="px-4 py-3">{{holding.symbol}}</td>
+                <td class=" px-4 py-3">{{holding.type}}</td>
+                <td class=" px-4 py-3 text-right">{{holding.quantity}}</td>
+                <td class="px-4 py-3 text-right">${{holding.purchase_price}}</td>
+                <td class=" px-4 py-3 text-right">${{holding.current_price}}</td>
+                <td class = "px-4 py-3 text-right">
+                {%if holding.percentage >= 0%}
+                    <span class=" text-emerald-500">{{holding.percentage}}%</span>
+                {%else%}
+                    <span class=" text-rose-500">{{holding.percentage}}%</span>
+                {%endif%}
+                </td>
+                <td class="px-4 py-3 text-right">
+                <button class="px-3 py-1 bg-indigo-500 text-white rounded text-sm mr-2 hover:bg-blue-600 cursor-pointer">
+                    Edit
+                </button>
+                <button class="px-3 py-1 bg-rose-500 text-white rounded text-sm hover:bg-red-600 cursor-pointer">
+                    Delete
+                </button>
+            </td>
+            </tr>
+        </tbody>
     {% endfor %}
+    {%endif%}
 </body>
 </html>

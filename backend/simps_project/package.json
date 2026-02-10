@@ -5,8 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch:css": "npx tailwindcss -i ./static/src/style.css -o ./static/dist/style.css --content './**/templates/**/*.html' --watch",
-     "runserver": "python manage.py runserver"
-    
+    "dev": "concurrently \"npm run watch:css\" \"python -u manage.py runserver --noreload\""
   },
   "keywords": [],
   "author": "",

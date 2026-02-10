@@ -26,16 +26,16 @@ def index(request):
         hold = (
             {"id":holding[0],
              "quantity":holding[1],
-             "purchase_price":holding[2],
+             "purchase_price":round(holding[2],2),
              "date_added":holding[3],
              "symbol":holding[4],
              "name":holding[5],
              "type":holding[6],
-             "current_price":holding[7],
+             "current_price":round(holding[7],2),
              "profit_loss": holding[1]*(holding[7]-holding[2]),
              "percentage":round(((holding[7]-holding[2])*(100))/holding[2],2)}
         )
-        hold["percentage_abs"] = abs(hold['percentage'])
+        
         holding_list.append(hold)
     
     context = {
