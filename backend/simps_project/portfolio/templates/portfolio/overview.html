@@ -6,50 +6,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Portfolio</title>
     <link rel="stylesheet" href="{% static 'dist/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </head>
-<body>
-    <h1 class = "text-5xl" >{{username}}'s Personal Portfolio</h1>
-    {%if not holdings%}
-    <h2>No Holdings Yet...</h2>
-    {%else%}
-    <table class = "table-auto border-gray-600 w-full">
-        <thead class = "border-b-2 border-gray-300">
-            <tr> 
-                <th scope = "col" class=" px-4 py-3 text-left">Symbol</th>
-                <th scope = "col" class="px-4 py-3 text-left">Type</th>
-                <th scope = "col" class="px-4 py-3 text-left">Quantity</th>
-                <th scope = "col" class="px-4 py-3 text-left">Purchase Price</th>
-                <th scope = "col" class="px-4 py-3 text-left">Current Price</th>
-                <th scope = "col" class="px-4 py-3 text-left">Gain/Loss</th>
-                <th scope = "col" class="px-4 py-3 text-left">Action</th>
-            </tr>
-        </thead>
-    {% for holding in holdings %}
-        <tbody>
-            <tr class="border-b border-gray-200 hover:bg-gray-50">
-                <td class="px-4 py-3">{{holding.symbol}}</td>
-                <td class=" px-4 py-3">{{holding.type}}</td>
-                <td class=" px-4 py-3 text-right">{{holding.quantity}}</td>
-                <td class="px-4 py-3 text-right">${{holding.purchase_price}}</td>
-                <td class=" px-4 py-3 text-right">${{holding.current_price}}</td>
-                <td class = "px-4 py-3 text-right">
-                {%if holding.percentage >= 0%}
-                    <span class=" text-emerald-500">{{holding.percentage}}%</span>
-                {%else%}
-                    <span class=" text-rose-500">{{holding.percentage}}%</span>
-                {%endif%}
-                </td>
-                <td class="px-4 py-3 text-right">
-                <button class="px-3 py-1 bg-indigo-500 text-white rounded text-sm mr-2 hover:bg-blue-600 cursor-pointer">
-                    Edit
-                </button>
-                <button class="px-3 py-1 bg-rose-500 text-white rounded text-sm hover:bg-red-600 cursor-pointer">
-                    Delete
-                </button>
-            </td>
-            </tr>
-        </tbody>
-    {% endfor %}
-    {%endif%}
+<body class="bg-gray-50 min-h-screen p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <h1 class="text-4xl font-bold text-gray-900 mb-10">
+            {{username}}'s Portfolio
+        </h1>
+
+        <div class="flex flex-wrap gap-6 mb-10">
+            <div class="flex-1 min-w-50 bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <p class="text-gray-600 text-sm mb-2">Total Invested</p>
+                <p class="text-gray-900 text-2xl font-bold">${{invest}}</p>
+            </div>
+            <div class="flex-1 min-w-50 bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <p class="text-gray-600 text-sm mb-2">Total Value</p>
+                <p class="text-gray-900 text-2xl font-bold">${{current}}</p>
+            </div>
+            <div class="flex-1 min-w-50 bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <p class="text-gray-600 text-sm mb-2">Total Gain / Loss</p>
+                <p class="text-2xl font-bold {% if total_p_l >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %}">
+                    ${{total_p_l}}
+                </p>
+            </div>
+            <div class="flex-1 min-w-50 bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <p class="text-gray-600 text-sm mb-2">Percent Gain / Loss</p>
+                <p class="text-2xl font-bold {% if total_prcnt >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %}">
+                    {{total_prcnt}}%
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+            <table class="w-full text-sm border-collapse">
+                <thead class="bg-indigo-100 text-gray-900">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Asset Name</th>
+                        <th class="px-6 py-3 text-left">Type</th>
+                        <th class="px-6 py-3 text-right">Quantity</th>
+                        <th class="px-6 py-3 text-right">Purchase Price</th>
+                        <th class="px-6 py-3 text-right">Current Price</th>
+                        <th class="px-6 py-3 text-right">Gain / Loss %</th>
+                        <th class="px-6 py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                {% for holding in holdings %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-gray-900">{{holding.name}}</td>
+                        <td class="px-6 py-4 text-gray-700">{{holding.type}}</td>
+                        <td class="px-6 py-4 text-right text-gray-900">{{holding.quantity}}</td>
+                        <td class="px-6 py-4 text-right text-gray-900">${{holding.purchase_price}}</td>
+                        <td class="px-6 py-4 text-right text-gray-900">${{holding.current_price}}</td>
+                        <td class="px-6 py-4 text-right font-semibold">
+                        {% if holding.percentage >= 0 %}
+                            <span class="text-emerald-500 flex items-center justify-end space-x-1">
+                                
+                                <span>{{holding.percentage}}%</span>
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                            </span>
+                        {% else %}
+                            <span class="text-rose-500 flex items-center justify-end space-x-1">
+                                
+                                <span>{{holding.percentage}}%</span>
+                                <i class="fa-solid fa-arrow-trend-down"></i>
+                            </span>
+                        {% endif %}
+                    </td>
+
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button class="px-3 py-1 bg-indigo-500 text-white rounded-md text-xs hover:bg-indigo-600 transition cursor-pointer">
+                                Edit
+                            </button>
+                            <button class="px-3 py-1 bg-rose-600 text-white rounded-md text-xs hover:bg-rose-700 transition cursor-pointer">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>

@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.db import connection,IntegrityError
 from django.contrib import auth
+from decimal import Decimal, ROUND_HALF_UP
 
 
 # Create your views here.
@@ -21,7 +22,7 @@ def index(request):
         user_row = cursor.fetchone()
     username = user_row[0]
     holding_list = []
-    
+    total_p_l=total_invest=total_current=total_prcnt = 0
     for holding in holdings:
         hold = (
             {"id":holding[0],
@@ -35,12 +36,18 @@ def index(request):
              "profit_loss": holding[1]*(holding[7]-holding[2]),
              "percentage":round(((holding[7]-holding[2])*(100))/holding[2],2)}
         )
-        
+        total_p_l += round(hold['profit_loss'],2)
+        total_invest += round(hold['quantity']*hold['purchase_price'],2)
+        total_current+= round(hold['quantity']*hold['current_price'],2)
+        total_prcnt = round( ((total_current - total_invest) * 100) / total_invest, 2)
         holding_list.append(hold)
-    
     context = {
         'username': username,
-        'holdings':holding_list
+        'holdings':holding_list,
+        'total_p_l':total_p_l,
+        'invest':total_invest,
+        'current':total_current,
+        'total_prcnt':total_prcnt
     }
     return render(request, "portfolio/overview.html",context)
 
