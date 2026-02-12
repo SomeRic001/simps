@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db import connection,IntegrityError
 from django.contrib import auth
 from decimal import Decimal, ROUND_HALF_UP
@@ -51,4 +51,29 @@ def index(request):
     }
     return render(request, "portfolio/overview.html",context)
 
-      
+
+def delete_holding(request,portfolio_id):
+    user_id = request.session.get('user_id')
+    
+    if not user_id:
+        return JsonResponse({'error':'Not Authenticated',
+                             'redirect':'/login/'},status = 401)
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+                SELECT user_id FROM Personal_Portfolio
+                WHERE portfolio_id = %s
+        """,[portfolio_id])
+        result = cursor.fetchone()
+
+        if not result:
+            return JsonResponse({'error':'Holding not found'},status = 404)
+        
+        if result[0]!=user_id:
+            return JsonResponse({'error':'Not Authorized'},status = 403)
+        
+        cursor.execute("""
+                       DELETE FROM Personal_Portfolio
+                       WHERE portfolio_id = %s
+                    """,[portfolio_id])
+    return JsonResponse({'success':True,'message':'Holding deleted successfully'})
