@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.db import connection,IntegrityError
 from django.contrib import auth
 from decimal import Decimal, ROUND_HALF_UP
-
+import json
 
 # Create your views here.
 def index(request):
@@ -36,6 +36,8 @@ def index(request):
              "profit_loss": holding[1]*(holding[7]-holding[2]),
              "percentage":round(((holding[7]-holding[2])*(100))/holding[2],2)}
         )
+        hold['invest_value'] = hold['quantity']*hold['purchase_price']
+        hold['current_value'] = hold['quantity']*hold['current_price']
         total_p_l += round(hold['profit_loss'],2)
         total_invest += round(hold['quantity']*hold['purchase_price'],2)
         total_current+= round(hold['quantity']*hold['current_price'],2)
@@ -54,7 +56,6 @@ def index(request):
 
 def delete_holding(request,portfolio_id):
     user_id = request.session.get('user_id')
-    
     if not user_id:
         return JsonResponse({'error':'Not Authenticated',
                              'redirect':'/login/'},status = 401)
@@ -77,3 +78,26 @@ def delete_holding(request,portfolio_id):
                        WHERE portfolio_id = %s
                     """,[portfolio_id])
     return JsonResponse({'success':True,'message':'Holding deleted successfully'})
+
+def edit_holding(request, portfolio_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'error':'Not Authenticated',
+                             'redirect':'/login/'},status = 401)
+    with connection.cursor() as cursor:
+        cursor.execute(""" SELECT user_id FROM Personal_Portfolio
+                       WHERE portfolio_id = %s  
+        """,[portfolio_id])
+        result = cursor.fetchone()
+
+        if not result:
+            return JsonResponse({'error':'Holding not found'},status= 404)
+        
+        if result[0]!=user_id:
+            return JsonResponse({'error':'Not Authorized'},status = 403)
+        
+        cursor.execute(""" UPDATE Personal_Portfolio 
+                        SET quantity = %s WHERE portfolio_id = %s 
+        """,[quantity,portfolio_id])
+    
+    return JsonResponse({'success':True,'message':'Holding Edited Successfully'})
