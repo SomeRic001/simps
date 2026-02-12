@@ -58,6 +58,24 @@ document.addEventListener('DOMContentLoaded',()=>
                     const currentEl = document.getElementById('total-current');
                     const totalEl = document.getElementById('total-pl');
                     const totalperEl = document.getElementById('total-percent');
+                    
+                    //Removing colors to change when deleted again
+                    totalEl.classList.remove('text-emerald-500', 'text-rose-500');
+                    totalperEl.classList.remove('text-emerald-500', 'text-rose-500');
+                    
+                    if(totalPL >=0){
+                        totalEl.classList.add('text-emerald-500');
+                    }
+                    else{
+                        totalEl.classList.add('text-rose-500');
+                    }
+
+                    if (totalPercent>=0){
+                        totalperEl.classList.add('text-emerald-500');
+                    }
+                    else{
+                        totalperEl.classList.add('text-rose-500');
+                    }
 
                     investEl.dataset.value =  totalInvest.toFixed(2);
                     investEl.innerText = '$'+ totalInvest.toFixed(2);
@@ -66,8 +84,8 @@ document.addEventListener('DOMContentLoaded',()=>
                     totalEl.dataset.value = totalPL.toFixed(2);
                     totalEl.innerText = '$'+ totalPL.toFixed(2);
                     totalperEl.dataset.value = totalPercent.toFixed(2);
-                    totalperEl.innerText = '$'+ totalPercent.toFixed(2);
-
+                    totalperEl.innerText =  totalPercent.toFixed(2) + '%';
+                    
                     row.remove();
 
                     alert('Holding deleted successfully!');
