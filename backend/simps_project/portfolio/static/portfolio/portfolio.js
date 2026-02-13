@@ -1,8 +1,8 @@
+
 document.addEventListener('DOMContentLoaded',()=>
 {
     const deleteButtons = document.querySelectorAll('.delete_btn');
-    
-    deleteButtons.forEach(button =>{
+    deleteButtons.forEach(function(button) {
         button.addEventListener('click', function(){
             const portfolioId = this.getAttribute('data-portfolio-id');
             const url = this.getAttribute('data-url');
@@ -106,6 +106,118 @@ document.addEventListener('DOMContentLoaded',()=>
             });
         });
     });
+
+    document.addEventListener("click",function(e){
+        if(e.target.classList.contains('edit_btn')){
+            handleEditClick(e.target);
+        }
+    })
+
+    function handleEditClick(button){
+    const row = button.closest('tr');
+    const qtycell = row.querySelector('.quantity_cell');
+
+    if(button.classList.contains('editing')){
+        save_content(button,row,qtycell);
+    }
+    else{
+        edit_content(button,qtycell);
+    }
+    }
+
+    function save_content(button,row,qtycell){
+        const input = qtycell.querySelector(".qty_input");
+        const newQty = parseInt(input.value);
+         const cell = button.parentElement;
+        const sibling_del = cell.querySelector('.delete_btn');
+
+        if(isNaN(newQty) || newQty <0 ){
+            alert("Quantity must be greater than zero.");
+            return;
+        }
+
+        const symbol = row.dataset.symbol;
+
+        updateQuantity(button,newQty)
+
+        .then(()=>{
+            qtycell.innerHTML=newQty;
+            button.innerHTML = "Edit";
+            button.classList.remove("editing");
+            sibling_del.disabled = false;
+            sibling_del.style.display = "inline-block";
+            recalculatePortfolio();
+        })
+        .catch(()=>{
+            alert("Update failed");
+        });
+    }
+
+    function edit_content(button,qtycell){
+        const current_qty = qtycell.innerText.trim();
+        const cell = button.parentElement;
+        const sibling_del = cell.querySelector('.delete_btn');
+        sibling_del.disabled = true;
+        sibling_del.style.display = "none";
+        qtycell.innerHTML = `<input type = "number" class = "qty_input" value  = "${current_qty}" min ="0" >`;
+        button.innerText="Save";
+        button.classList.add("editing");
+    }
+
+    function updateQuantity (button,quantity){
+        const url = button.getAttribute('data-url');
+        return fetch(url,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRFToken':getCookie('csrftoken')
+            },
+            body:JSON.stringify({
+                quantity: quantity
+            })
+        })
+    }
+
+    function recalculatePortfolio(){
+        const rows = document.querySelectorAll('tbody tr');
+        let totalInvest = 0;
+        let totalCurrent = 0;
+        rows.forEach(row=>{
+            const qtyCell = row.querySelector('.quantity_cell');
+            const qtyInput = qtyCell.querySelector('.qty_input');
+            const qty = qtyInput ? parseFloat(qtyInput.value) : parseFloat(qtyCell.innerText);
+
+            
+            const purchase_price = parseFloat(row.querySelector('.purchase_price').innerText.replace('$',''));
+            const current_price = parseFloat(row.querySelector('.current_price').innerText.replace('$',''));
+
+            totalInvest+= qty * purchase_price;
+            totalCurrent+= qty * current_price;
+
+        });
+        const totalPL = totalCurrent - totalInvest;
+        const totalPercent = totalInvest ? (totalPL / totalInvest) * 100 : 0;
+
+        const investEl = document.getElementById('total-invest');
+        const currentEl = document.getElementById('total-current');
+        const plEl = document.getElementById('total-pl');
+        const percentEl = document.getElementById('total-percent');
+
+        investEl.innerText = '$' + totalInvest.toFixed(2);
+        investEl.dataset.value = totalInvest.toFixed(2);
+        currentEl.innerText = '$' + totalCurrent.toFixed(2);
+        currentEl.dataset.value =  totalCurrent.toFixed(2);
+        plEl.innerText = '$' + totalPL.toFixed(2);
+        plEl.dataset.value =  totalPL.toFixed(2);
+        percentEl.innerText = totalPercent.toFixed(2) + '%';
+        percentEl.dataset.value =  totalPercent.toFixed(2);
+        
+        plEl.classList.toggle('text-emerald-500', totalPL >= 0);
+        plEl.classList.toggle('text-rose-500', totalPL < 0);
+        percentEl.classList.toggle('text-emerald-500', totalPL >= 0);
+        percentEl.classList.toggle('text-rose-500', totalPL < 0);
+    }
+
 });
 
 function getCookie(name){
@@ -122,3 +234,4 @@ function getCookie(name){
     }
     return cookieVal;
 }
+

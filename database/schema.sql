@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     date_of_registration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    username VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS Global_Equities(
@@ -26,5 +26,13 @@ CREATE TABLE Personal_Portfolio(
     date_added DATE NOT NULL,
     notes TEXT,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (equity_id) REFERENCES Global_Equities(equity_id)
+);
+
+CREATE TABLE IF NOT EXISTS Equity_Price_History (
+    price_id INT PRIMARY KEY AUTO_INCREMENT,
+    equity_id INT NOT NULL,
+    price DECIMAL(12, 4) NOT NULL,
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (equity_id) REFERENCES Global_Equities(equity_id)
 );
