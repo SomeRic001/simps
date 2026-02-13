@@ -58,7 +58,7 @@
                     {% for holding in holdings %}
                         <tr id="holding-{{ holding.id }}" data-invest="{{ holding.invest_value }}"
                         data-current="{{ holding.current_value }}"
-                        data-pl="{{ holding.profit_loss }}" class="hover:bg-gray-50 transition-colors">
+                        data-pl="{{ holding.profit_loss }}" data-symbol = "{{holding.symbol}}" class="hover:bg-gray-50 transition-colors">
                             
                             <td class="px-6 py-4 font-medium text-gray-900">
                                 {{holding.name}}
@@ -68,15 +68,15 @@
                                 {{holding.type}}
                             </td>
 
-                            <td class="px-6 py-4 text-right text-gray-900 hidden md:table-cell">
+                            <td class="quantity_cell px-6 py-4 text-right text-gray-900 hidden md:table-cell">
                                 {{holding.quantity}}
                             </td>
 
-                            <td class="px-6 py-4 text-right text-gray-900 hidden md:table-cell">
+                            <td class=" purchase_price px-6 py-4 text-right text-gray-900 hidden md:table-cell">
                                 ${{holding.purchase_price}}
                             </td>
 
-                            <td class="px-6 py-4 text-right text-gray-900">
+                            <td class=" current_price px-6 py-4 text-right text-gray-900">
                                 ${{holding.current_price}}
                             </td>
 
@@ -95,7 +95,8 @@
                             </td>
 
                             <td class="px-6 py-4 text-center space-x-2">
-                                <button class="px-3 py-1 bg-indigo-500 text-white rounded-md text-xs hover:bg-indigo-600 transition cursor-pointer">
+                                <button class="edit_btn px-3 py-1 bg-indigo-500 text-white rounded-md text-xs hover:bg-indigo-600 transition cursor-pointer"
+                                data-portfolio-id="{{holding.id}}" data-url="{% url 'portfolio:edit_holding' holding.id %}">
                                     Edit
                                 </button>
                                 <button 
