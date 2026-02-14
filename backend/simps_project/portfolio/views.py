@@ -11,6 +11,7 @@ def index(request):
     if not user_id:
        return redirect ("users:login")
     with connection.cursor() as cursor:
+
         cursor.execute("""SELECT p.portfolio_id,p.quantity,p.purchase_price,p.date_added,e.symbol, e.equity_name,e.type,e.current_price
             FROM personal_portfolio p
             JOIN global_equities e
@@ -20,6 +21,7 @@ def index(request):
         holdings = cursor.fetchall()
         cursor.execute("SELECT username from users where user_id = %s",[user_id])
         user_row = cursor.fetchone()
+    connection.commit()
     username = user_row[0]
     holding_list = []
     total_p_l=total_invest=total_current=total_prcnt = 0
@@ -43,6 +45,7 @@ def index(request):
         total_current+= round(hold['quantity']*hold['current_price'],2)
         total_prcnt = round( ((total_current - total_invest) * 100) / total_invest, 2)
         holding_list.append(hold)
+    print(holding_list)
     context = {
         'username': username,
         'holdings':holding_list,
@@ -147,3 +150,5 @@ def edit_holding(request, portfolio_id):
             'totalPercent': round(totalPercent,2)
         }
     })
+
+

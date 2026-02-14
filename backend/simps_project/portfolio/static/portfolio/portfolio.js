@@ -37,10 +37,11 @@ document.addEventListener('DOMContentLoaded',()=>
                 }
                 if(data.success){
                     const row = document.getElementById(`holding-${portfolioId}`);
-
+                    const mobileCard = document.getElementById(`holding-mobile-${portfolioId}`);
                     const invest = parseFloat(row.dataset.invest);
                     const current = parseFloat(row.dataset.current);
                     const pl = parseFloat(row.dataset.pl);
+                    
 
                     let totalInvest = parseFloat(document.getElementById('total-invest').dataset.value);
                     let totalCurrent = parseFloat(document.getElementById('total-current').dataset.value);
@@ -159,7 +160,7 @@ document.addEventListener('DOMContentLoaded',()=>
         const sibling_del = cell.querySelector('.delete_btn');
         sibling_del.disabled = true;
         sibling_del.style.display = "none";
-        qtycell.innerHTML = `<input type = "number" class = "qty_input" value  = "${current_qty}" min ="0" >`;
+        qtycell.innerHTML = `<input type="number" class="qty_input w-16" value="${current_qty}" min="0">`;
         button.innerText="Save";
         button.classList.add("editing");
     }

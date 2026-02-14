@@ -97,3 +97,8 @@ def is_valid_email(identifier):
         return False
     
     return True
+
+def logout(request):
+    request.session.flush()
+
+    return redirect("users:landing")
