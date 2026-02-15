@@ -1,6 +1,7 @@
 
 document.addEventListener('DOMContentLoaded',()=>
 {
+    loadPortfolioChart(); 
     const deleteButtons = document.querySelectorAll('.delete_btn');
     deleteButtons.forEach(function(button) {
         button.addEventListener('click', function(){
@@ -219,6 +220,113 @@ document.addEventListener('DOMContentLoaded',()=>
         percentEl.classList.toggle('text-rose-500', totalPL < 0);
     }
 
+    function loadPortfolioChart() {
+    fetch('/portfolio/chart-data/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Chart error:', data.error);
+                return;
+            }
+            createPortfolioChart(data);
+        })
+        .catch(error => {
+            console.error('Error loading chart:', error);
+        });
+    }
+
+    function createPortfolioChart(data) {
+    const ctx = document.getElementById('portfolioChart');
+    
+    if (!ctx) {
+        console.error('Chart canvas not found');
+        return;
+    }
+    
+    new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [{
+                label: 'Portfolio Value',
+                data: data.values,
+                borderColor: 'rgb(99, 102, 241)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: 'rgb(99, 102, 241)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Value: $' + context.parsed.y.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        },
+                        font: {
+                            size: 11
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11
+                        },
+                        maxRotation: 45,
+                        minRotation: 0
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+    }   
 });
 
 function getCookie(name){

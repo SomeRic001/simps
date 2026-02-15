@@ -152,3 +152,40 @@ def edit_holding(request, portfolio_id):
     })
 
 
+def portfolio_chart(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'error':'Not Authenticated',
+                             'redirect':'/login/'},status = 401)
+    with connection.cursor() as cursor:
+        cursor.execute("""
+                        SELECT 
+                        ph.price_date,
+                        SUM(pp.quantity * ph.price) as total_value
+                    FROM Personal_Portfolio pp
+                    JOIN (
+                        SELECT 
+                            equity_id,
+                            DATE(recorded_at) as price_date,
+                            price
+                        FROM equity_price_history eph1
+                        WHERE recorded_at = (
+                            SELECT MAX(recorded_at)
+                            FROM equity_price_history eph2
+                            WHERE eph2.equity_id = eph1.equity_id
+                            AND DATE(eph2.recorded_at) = DATE(eph1.recorded_at)
+                        )
+                        AND DATE(recorded_at) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                    ) ph ON pp.equity_id = ph.equity_id
+                    WHERE pp.user_id = %s
+                    GROUP BY ph.price_date
+                    ORDER BY ph.price_date ASC
+        """,[user_id])
+        history = cursor.fetchall()
+
+        chart_data = {
+            'dates':[row[0].strftime('%b %d') for row in history],
+            'values':[float(row[1]) for row in history]
+        }
+    
+    return JsonResponse(chart_data)
