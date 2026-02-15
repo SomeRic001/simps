@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'user',
     'portfolio',
+    'dashboard',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'simps',
         'USER': 'root',
-        'PASSWORD':'',
+        'PASSWORD':'prayushdbms',
         'HOST':'localhost',
         'PORT':'3306',
     }
