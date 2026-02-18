@@ -342,3 +342,11 @@ def get_savings(request):
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
             
+
+def dashboard_home(request):
+    """Display the dashboard home page"""
+    return render(request, 'dashboard/dashboard.html')
+
+def add_income_page(request):
+    """Display the add income form page"""
+    return render(request, 'dashboard/add_income.html')

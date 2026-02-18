@@ -2,6 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+
+    path('', views.dashboard_home, name='dashboard_home'), 
+    path('add-income-page/', views.add_income_page, name='add_income_page'),
+   
     # Income URLs
     path('add-income/', views.add_income, name='add_income'),
     path('get-income/', views.get_income, name='get_income'),

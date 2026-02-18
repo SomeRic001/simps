@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SIMPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-600">SIMPS</h1>
+                
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                    <a href="{% url 'dashboard_home' %}" class="text-indigo-600 font-semibold border-b-2 border-indigo-600 pb-1">
+                        Dashboard
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Explore
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Portfolio
+                    </a>
+                    <form method="POST" action="{% url 'users:logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition font-medium">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Title -->
+        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
+            Financial Dashboard
+        </h1>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Total Income Card -->
+            <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-gray-600 text-sm">Total Income</p>
+                    <i class="fas fa-arrow-up text-emerald-500 text-xl"></i>
+                </div>
+                <p id="total-income" class="text-gray-900 text-3xl font-bold">
+                    $0.00
+                </p>
+                <p class="text-gray-500 text-xs mt-2">This month</p>
+            </div>
+
+            <!-- Total Expenses Card -->
+            <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-gray-600 text-sm">Total Expenses</p>
+                    <i class="fas fa-arrow-down text-rose-500 text-xl"></i>
+                </div>
+                <p id="total-expenses" class="text-gray-900 text-3xl font-bold">
+                    $0.00
+                </p>
+                <p class="text-gray-500 text-xs mt-2">This month</p>
+            </div>
+
+            <!-- Net Savings Card -->
+            <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-gray-600 text-sm">Net Savings</p>
+                    <i class="fas fa-piggy-bank text-indigo-500 text-xl"></i>
+                </div>
+                <p id="net-savings" class="text-3xl font-bold text-indigo-600">
+                    $0.00
+                </p>
+                <p class="text-gray-500 text-xs mt-2">This month</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <!-- Add Income Button -->
+            <a href="{% url 'add_income_page' %}" class="block">                <div class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 hover:bg-emerald-100 transition-colors cursor-pointer">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-emerald-500 text-white p-4 rounded-full">
+                            <i class="fas fa-plus text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Add Income</h3>
+                            <p class="text-gray-600 text-sm">Record your earnings</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Add Expense Button -->
+            <a href="{% url 'add_expense' %}" class="block">
+                <div class="bg-rose-50 border-2 border-rose-200 rounded-xl p-6 hover:bg-rose-100 transition-colors cursor-pointer">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-rose-500 text-white p-4 rounded-full">
+                            <i class="fas fa-minus text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Add Expense</h3>
+                            <p class="text-gray-600 text-sm">Track your spending</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+            <div class="px-6 py-4 bg-indigo-100 border-b">
+                <h2 class="text-xl font-bold text-gray-900">Recent Transactions</h2>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-500 text-center py-8">No transactions yet. Start by adding income or expenses!</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
