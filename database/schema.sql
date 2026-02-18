@@ -36,3 +36,36 @@ CREATE TABLE IF NOT EXISTS Equity_Price_History (
     recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (equity_id) REFERENCES Global_Equities(equity_id)
 );
+
+-- Income, Expenses and Savings tables for exploration page
+
+CREATE TABLE IF NOT EXISTS Income (
+    income_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    amount DECIMAL(15, 2),
+    source VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Expenses (
+    expense_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    amount DECIMAL(15, 2),
+    category VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Savings (
+    savings_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    total_income DECIMAL(15, 2),
+    total_expenses DECIMAL(15, 2),
+    savings_amount DECIMAL(15, 2),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
