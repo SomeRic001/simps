@@ -6,16 +6,17 @@ from .utils import get_current_savings, get_next_equity, process_purchase
 # explore page ko home
 def explore_home(request):
     user_id = request.session.get("user_id")
-
     if not user_id:
         return redirect("users:login")
 
     equity = get_next_equity(user_id)
-
     if not equity:
         return render(request, "exploration/explore.html", {"no_more": True})
 
     savings = get_current_savings(user_id)
+    
+    # Ensure savings is a float/int for comparison
+    can_invest = savings > 0 
 
     context = {
         "equity_id": equity[0],
@@ -24,9 +25,9 @@ def explore_home(request):
         "price": equity[3],
         "sector": equity[4],
         "max_invest": savings,
+        "can_invest": can_invest, # Pass this boolean to the template
         "default_value": 10 if savings >= 10 else savings
     }
-
     return render(request, "exploration/explore.html", context)
 
 

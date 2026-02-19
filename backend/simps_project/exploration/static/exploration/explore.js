@@ -22,7 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     buyBtn.addEventListener("click", async () => {
-        buyBtn.disabled = true; // Prevent double clicks immediately
+        // when 0 savings dont let them choose
+        if (buyBtn.disabled) return; 
+        // Prevent double clicks immediately
+        buyBtn.disabled = true; 
 
         
         animateThen("swipe-right", async () => {
