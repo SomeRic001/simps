@@ -105,7 +105,7 @@ def update_prices():
         with connection.cursor() as cursor:
             for symbol in symbol_batch:
                 try:
-                    if len(symbols)>1:
+                    if len(symbol_batch)>1:
                         price = data[symbol]['Close'].iloc[-1]
                     else:
                         price = data['Close'].iloc[-1]
@@ -117,12 +117,14 @@ def update_prices():
                     equity_id = equity_map[symbol]
 
                     cursor.execute(''' UPDATE Global_Equities
-                                SET current_price = %s , last_updated = NOW()
-                                WHERE equity_id = %s
-                    ''', [price,equity_id])
+                        SET current_price = %s, last_updated = NOW()
+                        WHERE equity_id = %s
+                    ''', [price, equity_id])
 
                     cursor.execute(''' INSERT INTO Equity_Price_History (equity_id, price)
-                VALUES (%s, %s) ''', [equity_id, price])
+                        VALUES (%s, %s)
+                        ON CONFLICT DO NOTHING
+                    ''', [equity_id, price])
 
                 except Exception as e:
                     print(e)
