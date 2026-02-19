@@ -41,7 +41,7 @@ def add_income(request):
 def get_income(request):
     if request.method =='GET':
         try:
-            user_id= request.GET.get('user_id')
+            user_id= request.session.get('user_id')
 
             query="""
                 SELECT * FROM income
@@ -161,7 +161,7 @@ def add_expense(request):
 def get_expenses(request):
     if request.method == 'GET':
         try:
-            user_id = request.GET.get('user_id')
+            user_id = request.session.get('user_id')
             
             query = """
                 SELECT * FROM expenses 
@@ -318,7 +318,7 @@ def calculate_savings(request):
 def get_savings(request):
     if request.method == 'GET':
         try:
-            user_id = request.GET.get('user_id')
+            user_id = request.session.get('user_id')
             
             query = """
                 SELECT * FROM savings 
