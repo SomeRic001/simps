@@ -1,3 +1,4 @@
+let portfolioChart = null; 
 
 document.addEventListener('DOMContentLoaded',()=>
 {
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded',()=>
                     const totalEl = document.getElementById('total-pl');
                     const totalperEl = document.getElementById('total-percent');
                     
-                    //Removing colors to change when deleted again
+                    //Changing colors
                     totalEl.classList.remove('text-emerald-500', 'text-rose-500');
                     totalperEl.classList.remove('text-emerald-500', 'text-rose-500');
                     
@@ -94,7 +95,9 @@ document.addEventListener('DOMContentLoaded',()=>
                 }
                 else{
                     alert('Error: '+data.error);
-                }}
+                }
+                loadPortfolioChart();
+                }
                 catch(e){
                     console.error('Failed to parse JSON:',e);
                     console.error('Response was:',text);
@@ -149,6 +152,7 @@ document.addEventListener('DOMContentLoaded',()=>
             sibling_del.disabled = false;
             sibling_del.style.display = "inline-block";
             recalculatePortfolio();
+            loadPortfolioChart();
         })
         .catch(()=>{
             alert("Update failed");
@@ -168,6 +172,7 @@ document.addEventListener('DOMContentLoaded',()=>
 
     function updateQuantity (button,quantity){
         const url = button.getAttribute('data-url');
+         
         return fetch(url,{
             method:'POST',
             headers:{
@@ -178,6 +183,7 @@ document.addEventListener('DOMContentLoaded',()=>
                 quantity: quantity
             })
         })
+        
     }
 
     function recalculatePortfolio(){
@@ -242,8 +248,11 @@ document.addEventListener('DOMContentLoaded',()=>
         console.error('Chart canvas not found');
         return;
     }
-    
-    new Chart(ctx.getContext('2d'), {
+    if (portfolioChart) {
+        portfolioChart.destroy();
+    }
+
+    portfolioChart = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
             labels: data.dates,
