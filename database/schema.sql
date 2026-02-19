@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT PRIMARY KEY SERIAL,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS Global_Equities(
-    equity_id INT PRIMARY KEY AUTO_INCREMENT,
+    equity_id INT PRIMARY KEY SERIAL,
     symbol VARCHAR(30) UNIQUE NOT NULL,
     equity_name VARCHAR(255) NOT NULL,
     type VARCHAR(255),
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Global_Equities(
 );
 
 CREATE TABLE IF NOT EXISTS Personal_Portfolio(
-    portfolio_id INT PRIMARY KEY AUTO_INCREMENT,
+    portfolio_id INT PRIMARY KEY SERIAL,
     user_id INT NOT NULL,
     equity_id INT NOT NULL,
     quantity DECIMAL(12, 4) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Personal_Portfolio(
 );
 
 CREATE TABLE IF NOT EXISTS Equity_Price_History (
-    price_id INT PRIMARY KEY AUTO_INCREMENT,
+    price_id INT PRIMARY KEY SERIAL,
     equity_id INT NOT NULL,
     price DECIMAL(12, 4) NOT NULL,
     recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS Equity_Price_History (
 
 -- Income, Expenses and Savings tables for exploration page
 CREATE TABLE IF NOT EXISTS Income (
-    income_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    income_id INTEGER PRIMARY KEY SERIAL,
     user_id INTEGER,
     month INTEGER,
     year INTEGER,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS Income (
 );
 
 CREATE TABLE IF NOT EXISTS Expenses (
-    expense_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    expense_id INTEGER PRIMARY KEY SERIAL,
     user_id INTEGER,
     month INTEGER,
     year INTEGER,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS Expenses (
 );
 
 CREATE TABLE IF NOT EXISTS Savings (
-    savings_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    savings_id INTEGER PRIMARY KEY SERIAL,
     user_id INTEGER,
     month INTEGER,
     year INTEGER,
