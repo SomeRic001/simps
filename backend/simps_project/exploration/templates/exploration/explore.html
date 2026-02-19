@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Explore Equities - SIMPS{% endblock %}
+{% block content %}
+
+<body class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
+
+{% if no_more %}
+    <div class="bg-white p-8 rounded-2xl shadow-xl text-center">
+        <h2 class="text-2xl font-bold">No More Equities </h2>
+        <p class="text-gray-500 mt-2">You’ve explored everything.</p>
+    </div>
+{% else %}
+
+<div class="w-96">
+
+    <div class="card bg-white rounded-2xl shadow-xl p-6">
+
+        <h2 class="text-2xl font-bold">{{ name }}</h2>
+        <p class="text-gray-500">{{ symbol }}</p>
+        <p class="mt-2 text-lg">${{ price }}</p>
+        <p class="text-sm text-gray-400">{{ sector }}</p>
+
+        <div class="mt-4">
+            <input type="range"
+                   min="1"
+                   max="{{ max_invest }}"
+                   value="{{ default_value }}"
+                   class="amountSlider w-full">
+
+            <p class="text-center mt-2">
+                Invest: $<span class="amountValue">{{ default_value }}</span>
+            </p>
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <button id="skipBtn"
+                class="bg-red-500 text-white px-6 py-2 rounded-full">
+                ✕
+            </button>
+
+            <button id="buyBtn"
+                class="bg-green-500 text-white px-6 py-2 rounded-full">
+                ✔
+            </button>
+        </div>
+
+        <!-- Hidden form just for CSRF -->
+        <form id="buyForm" method="POST" action="{% url 'explore:buy_equity' %}">
+            {% csrf_token %}
+            <input type="hidden" name="equity_id" value="{{ equity_id }}">
+            <input type="hidden" name="amount" id="hiddenAmount">
+        </form>
+
+    </div>
+
+</div>
+
+{% endif %}
+{% end block %}
+
+{% block extra_scripts %}
+<script src="{% static 'exploration/explore.js' %}"></script>
+{% endblock %}

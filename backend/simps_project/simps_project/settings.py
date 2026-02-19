@@ -29,10 +29,11 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+# added explore pag3
 INSTALLED_APPS = [
     'user',
     'portfolio',
+    'exploration', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'simps',
         'USER': 'root',
-        'PASSWORD':'',
+        'PASSWORD':'root123@', # mylocal root password for now
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -121,6 +122,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# gpt said to keep this, to render static pages
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
