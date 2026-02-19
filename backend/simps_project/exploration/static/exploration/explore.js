@@ -12,38 +12,58 @@ document.addEventListener("DOMContentLoaded", function () {
         amountValue.textContent = slider.value;
     });
 
+    // Helper function for animations
+    function animateThen(cls, callback) {
+        const card = document.querySelector(".card"); 
+        card.classList.add(cls);
+        card.addEventListener("animationend", callback, { once: true });
+    }
+
     buyBtn.addEventListener("click", async () => {
-        // Prepare form data
-        const formData = new FormData(form);
-        formData.set("amount", slider.value);
+        buyBtn.disabled = true; // Prevent double clicks immediately
 
-        try {
-            buyBtn.disabled = true; // Prevent double clicks
-            
-            const response = await fetch(form.action, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest", // Tells Django this is an AJAX request
+        
+        animateThen("swipe-right", async () => {
+            // Once animation ends, prepare the data
+            const formData = new FormData(form);
+            formData.set("amount", slider.value);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        // Include the CSRF token for Fetch
+                        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value 
+                    }
+                });
+
+                if (response.ok) {
+                    // If successful, redirect to the next equity
+                    window.location.href = "/explore/"; 
+                } else {
+                    const data = await response.json();
+                    
+                    // If error, bring the card back and alert
+                    const card = document.querySelector(".card");
+                    card.classList.remove("swipe-right"); 
+                    alert("⚠️ " + (data.error || "Insufficient funds to invest."));
+                    buyBtn.disabled = false;
                 }
-            });
-
-            if (response.ok) {
-                // If successful, reload to show the next equity
-                window.location.href = "{% url 'explore:home' %}"; 
-            } else {
-                const data = await response.json();
-                alert("⚠️ " + (data.error || "Insufficient funds to invest."));
+            } catch (error) {
+                console.error("Error:", error);
+                const card = document.querySelector(".card");
+                card.classList.remove("swipe-right");
+                alert("An unexpected error occurred.");
                 buyBtn.disabled = false;
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An unexpected error occurred.");
-            buyBtn.disabled = false;
-        }
+        });
     });
 
     skipBtn.addEventListener("click", () => {
-        window.location.reload();
+        animateThen("swipe-left",()=>{
+            window.location.reload();
+        });
     });
 });
