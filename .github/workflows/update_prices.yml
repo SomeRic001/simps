@@ -1,27 +1,57 @@
 name: Update Stock Prices
 
 on:
-  schedule:
-    - cron: '30 14,20 * * 1-5'
   workflow_dispatch:
+  schedule:
+    - cron: '30 14,20 * * 1-5'  # Runs at 21:05 UTC (after US market close)
 
 jobs:
   update-prices:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Setup Python 3.12.2 (Required for Django 6)
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12.2'
+          cache: 'pip'
 
+      # Verify Python version
+      - name: Verify Python Version
+        run: |
+          echo "Checking Python version..."
+          python --version
+          pip --version
+
+      # Install dependencies
       - name: Install Dependencies
         run: |
+          echo "Installing dependencies..."
+          python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
+      # Verify environment variables
+      - name: Verify Environment Variables
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+        run: |
+          echo "Verifying environment variables..."
+          if [ -z "$DB_HOST" ]; then echo "DB_HOST not set"; exit 1; fi
+          if [ -z "$DB_USER" ]; then echo "DB_USER not set"; exit 1; fi
+          if [ -z "$DB_PASSWORD" ]; then echo "DB_PASSWORD not set"; exit 1; fi
+          if [ -z "$DB_NAME" ]; then echo "DB_NAME not set"; exit 1; fi
+          echo "Environment variables verified."
+
+      # Run price updater script
       - name: Run Price Updater
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -30,5 +60,17 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PORT: ${{ secrets.DB_PORT }}
         run: |
+          echo "Starting price update script..."
           cd backend/simps_project
           python scripts/price_updater.py
+          echo "Price update script finished successfully."
+
+      # Success message
+      - name: Success
+        if: success()
+        run: echo "Workflow completed successfully."
+
+      # Failure message
+      - name: Failure
+        if: failure()
+        run: echo "Workflow failed. Check logs above."
