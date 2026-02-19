@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -344,21 +344,39 @@ def get_savings(request):
             
 
 def dashboard_home(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/dashboard.html')
 
 
 def add_income_page(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/add_income.html')
 
 
 def add_expense_page(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/add_expense.html')
 
 def view_income_page(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/view_income.html')
 
 def view_expenses_page(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/view_expenses.html')
 
 def view_savings_page(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+       return redirect("users:login")
     return render(request, 'dashboard/view_savings.html')
