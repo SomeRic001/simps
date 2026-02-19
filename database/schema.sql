@@ -7,13 +7,14 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE
 );
 
+-- increase the length for strings
 CREATE TABLE IF NOT EXISTS Global_Equities(
     equity_id INT PRIMARY KEY AUTO_INCREMENT,
-    symbol VARCHAR(10) UNIQUE NOT NULL,
+    symbol VARCHAR(30) UNIQUE NOT NULL,
     equity_name VARCHAR(255) NOT NULL,
-    type VARCHAR(20),
+    type VARCHAR(255),
     current_price DECIMAL(12, 4),
-    sector VARCHAR(100),
+    sector VARCHAR(255),
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -35,4 +36,37 @@ CREATE TABLE IF NOT EXISTS Equity_Price_History (
     price DECIMAL(12, 4) NOT NULL,
     recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (equity_id) REFERENCES Global_Equities(equity_id)
+);
+
+-- Income, Expenses and Savings tables for exploration page
+
+CREATE TABLE IF NOT EXISTS Income (
+    income_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    amount DECIMAL(15, 2),
+    source VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Expenses (
+    expense_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    amount DECIMAL(15, 2),
+    category VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Savings (
+    savings_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER,
+    month INTEGER,
+    year INTEGER,
+    total_income DECIMAL(15, 2),
+    total_expenses DECIMAL(15, 2),
+    savings_amount DECIMAL(15, 2),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

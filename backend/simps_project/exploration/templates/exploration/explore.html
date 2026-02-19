@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Explore Equities - SIMPS{% endblock %}
+{%block extra_head %}
+<style>
+  @keyframes swipe-left {
+    0%   { transform: translateX(0) ; opacity: 1; }
+    100% { transform: translateX(-140%); opacity: 0; }
+  }
+  @keyframes swipe-right {
+    0%   { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(140%); opacity: 0; }
+  }
+  .swipe-left  { animation: swipe-left  0.4s ease-in forwards; }
+  .swipe-right { animation: swipe-right 0.4s ease-in forwards; }
+</style>
+{%endblock%}
+{% block content %}
+
+<div class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
+
+{% if no_more %}
+    <div class="bg-white p-8 rounded-2xl shadow-xl text-center">
+        <h2 class="text-2xl font-bold">No More Equities</h2>
+        <p class="text-gray-500 mt-2">You’ve explored everything.</p>
+    </div>
+{% else %}
+
+
+<div class="w-96">
+    <div class="card bg-white rounded-2xl shadow-xl p-6">
+
+        <h2 class="text-2xl font-bold">{{ name }}</h2>
+        <p class="text-gray-500">{{ symbol }}</p>
+        <p class="mt-2 text-lg">${{ price }}</p>
+        <p class="text-sm text-gray-400">{{ sector }}</p>
+
+        <div class="mt-4">
+            <input type="range"
+                   min="1"
+                   max="{{ max_invest }}"
+                   value="{{ default_value }}"
+                   class="amountSlider w-full">
+
+            <p class="text-center mt-2">
+                Invest: $<span class="amountValue">{{ default_value }}</span>
+            </p>
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <button id="skipBtn"
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full transition-colors">
+                ✕
+            </button>
+
+            <button id="buyBtn"
+                {% if not can_invest %}
+                    disabled
+                    class="bg-gray-400 cursor-not-allowed text-white px-6 py-2 rounded-full"
+                {% else %}
+                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full transition-colors"
+                {% endif %}>
+                ✔
+            </button>
+        </div>
+
+        {% if not can_invest %}
+            <p class="text-red-500 text-xs text-center mt-2 italic">
+                Insufficient savings to invest.
+            </p>
+        {% endif %}
+
+        <form id="buyForm" method="POST" action="{% url 'explore:buy_equity' %}">
+            {% csrf_token %}
+            <input type="hidden" name="equity_id" value="{{ equity_id }}">
+            <input type="hidden" name="amount" id="hiddenAmount">
+        </form>
+    </div>
+</div>
+</div>
+
+{% endif %}
+</div> {% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'exploration/explore.js' %}"></script>
+{% endblock %}
