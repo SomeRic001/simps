@@ -24,10 +24,11 @@ def login(request):
             cursor.execute("SELECT password_hash,user_id FROM users WHERE email = %s OR username = %s",[identifier,identifier])
             stored_hash = cursor.fetchone() 
         if (stored_hash == None):
-            errors.append("User with this email/username doesn't exist")   
-        is_correct = bcrypt.checkpw(login_pw.encode('utf-8'),stored_hash[0].encode('utf-8'))
-        if (not is_correct):
-            errors.append("Invalid username or password")
+            errors.append("User does not exist")   
+        else:
+            is_correct = bcrypt.checkpw(login_pw.encode('utf-8'),stored_hash[0].encode('utf-8'))
+            if (not is_correct):
+                errors.append("Invalid username or password")
         if (errors):
             context = {"error":errors[0],"form_data":request.POST}
             return render(request,"user/login.html",context)
