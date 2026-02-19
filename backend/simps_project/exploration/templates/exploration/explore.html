@@ -2,9 +2,23 @@
 {% load static %}
 
 {% block title %}Explore Equities - SIMPS{% endblock %}
+{%block extra_head %}
+<style>
+  @keyframes swipe-left {
+    0%   { transform: translateX(0) ; opacity: 1; }
+    100% { transform: translateX(-140%); opacity: 0; }
+  }
+  @keyframes swipe-right {
+    0%   { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(140%); opacity: 0; }
+  }
+  .swipe-left  { animation: swipe-left  0.4s ease-in forwards; }
+  .swipe-right { animation: swipe-right 0.4s ease-in forwards; }
+</style>
+{%endblock%}
 {% block content %}
 
-<body class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
+<div class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
 
 {% if no_more %}
     <div class="bg-white p-8 rounded-2xl shadow-xl text-center">
@@ -13,8 +27,8 @@
     </div>
 {% else %}
 
-<div class="w-96">
 
+<div class="w-96">
     <div class="card bg-white rounded-2xl shadow-xl p-6">
 
         <h2 class="text-2xl font-bold">{{ name }}</h2>
@@ -36,13 +50,13 @@
 
         <div class="flex justify-between mt-6">
             <button id="skipBtn"
-                class="bg-red-500 text-white px-6 py-2 rounded-full">
+                class="bg-rose-500 text-white px-6 py-2 rounded-full hover:bg-rose-600 transition cursor-pointer">
                 ✕
             </button>
 
             <button id="buyBtn"
-                class="bg-green-500 text-white px-6 py-2 rounded-full">
-                ✔
+                class="bg-emerald-500 text-white px-6 py-2 rounded-full hover:bg-emerald-600 transition cursor-pointer">
+                ✓
             </button>
         </div>
 
@@ -54,11 +68,11 @@
         </form>
 
     </div>
-
+</div>
 </div>
 
 {% endif %}
-{% end block %}
+{% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static 'exploration/explore.js' %}"></script>
