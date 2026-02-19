@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE
 );
 
--- increase the length for strings
 CREATE TABLE IF NOT EXISTS Global_Equities(
     equity_id INT PRIMARY KEY AUTO_INCREMENT,
     symbol VARCHAR(30) UNIQUE NOT NULL,
@@ -18,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Global_Equities(
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Personal_Portfolio(
+CREATE TABLE IF NOT EXISTS Personal_Portfolio(
     portfolio_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     equity_id INT NOT NULL,
@@ -39,7 +38,6 @@ CREATE TABLE IF NOT EXISTS Equity_Price_History (
 );
 
 -- Income, Expenses and Savings tables for exploration page
-
 CREATE TABLE IF NOT EXISTS Income (
     income_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id INTEGER,
