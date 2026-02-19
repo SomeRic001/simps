@@ -40,12 +40,11 @@ def get_next_equity(user_id):
 # make this atomic transaction -> either executes or rolls back 
 @transaction.atomic
 def process_purchase(user_id, equity_id, amount):
-
     now = datetime.now()
     amount = Decimal(amount)
 
     with connection.cursor() as cursor:
-
+        # 1. Fetch current savings and lock row
         cursor.execute("""
             SELECT savings_id, savings_amount
             FROM Savings
@@ -54,66 +53,56 @@ def process_purchase(user_id, equity_id, amount):
             LIMIT 1
             FOR UPDATE
         """, [user_id])
-
         savings_row = cursor.fetchone()
 
         if not savings_row:
             return {"error": "No savings record"}
 
-        savings_id = savings_row[0]
-        current_savings = Decimal(savings_row[1])
+        savings_id, current_savings = savings_row[0], Decimal(savings_row[1])
 
-        # Validate
         if amount < 1 or amount > current_savings:
             return {"error": "Invalid amount"}
 
-        # Get equity price
+        # 2. Fetch equity price AND name
         cursor.execute("""
-            SELECT current_price
+            SELECT current_price, equity_name
             FROM Global_Equities
             WHERE equity_id = %s
         """, [equity_id])
-
-        price_row = cursor.fetchone()
-
-        if not price_row:
+        
+        equity_row = cursor.fetchone()
+        if not equity_row:
             return {"error": "Equity not found"}
 
-        price = Decimal(price_row[0])
+        price = Decimal(equity_row[0])
+        equity_name = equity_row[1]  # Store the equity name 
         quantity = amount / price
 
-        # Lock portfolio row if exists
+        # 3. Handle Personal Portfolio (Update or Insert)
         cursor.execute("""
-            SELECT portfolio_id
-            FROM Personal_Portfolio
+            SELECT portfolio_id FROM Personal_Portfolio
             WHERE user_id = %s AND equity_id = %s
             FOR UPDATE
         """, [user_id, equity_id])
-
+        
         existing = cursor.fetchone()
-
         if existing:
-            # Update quantity
             cursor.execute("""
                 UPDATE Personal_Portfolio
                 SET quantity = quantity + %s
                 WHERE portfolio_id = %s
             """, [quantity, existing[0]])
         else:
-            # Insert new portfolio
             cursor.execute("""
                 INSERT INTO Personal_Portfolio
                 (user_id, equity_id, quantity, purchase_price, date_added)
                 VALUES (%s, %s, %s, %s, %s)
-            """, [
-                user_id,
-                equity_id,
-                quantity,
-                price,
-                now.date()
-            ])
+            """, [user_id, equity_id, quantity, price, now.date()])
 
-        # Insert expense
+        # 4. Insert expense with the dynamic name
+        # We use Python string formatting for the category text
+        category_text = f"Equity Purchase: {equity_name}"
+        
         cursor.execute("""
             INSERT INTO Expenses
             (user_id, month, year, amount, category)
@@ -123,10 +112,10 @@ def process_purchase(user_id, equity_id, amount):
             now.month,
             now.year,
             amount,
-            "Equity Purchase"
+            category_text  # Dynamic category name
         ])
 
-        # Update savings safely
+        # 5. Update savings
         cursor.execute("""
             UPDATE Savings
             SET total_expenses = total_expenses + %s,
