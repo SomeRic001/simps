@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'user',
     'portfolio',
+    'dashboard',
     'exploration', 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'simps',
         'USER': 'root',
-        'PASSWORD':'root123@', # mylocal root password for now
+        'PASSWORD':'', # mylocal root password for now
         'HOST':'localhost',
         'PORT':'3306',
     }

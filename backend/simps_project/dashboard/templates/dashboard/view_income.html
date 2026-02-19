@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Income - SIMPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-600">SIMPS</h1>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'dashboard_home' %}" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Dashboard
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Explore
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Income History</h1>
+            <a href="{% url 'add_income_page' %}" 
+               class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
+                <i class="fas fa-plus mr-2"></i>
+                Add Income
+            </a>
+        </div>
+
+        <!-- Message Div -->
+        <div id="message" class="hidden mb-4 p-4 rounded-lg"></div>
+
+        <!-- Income Table -->
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-indigo-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Source</th>
+                            <th class="px-6 py-3 text-right text-sm font-semibold text-gray-900">Amount</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold text-gray-900">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incomeTableBody" class="divide-y divide-gray-200">
+                        <!-- Income rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-8 text-center text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-4"></i>
+                <p>No income records found. Start by adding your first income!</p>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="{% url 'dashboard_home' %}" 
+           class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mt-6">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <script>
+        // Fetch and display income data
+        async function loadIncomeData() {
+            try {
+                const response = await fetch('/dashboard/get-income/?user_id=1');
+                const result = await response.json();
+                
+                const tableBody = document.getElementById('incomeTableBody');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (result.status === 'success' && result.data.length > 0) {
+                    tableBody.innerHTML = '';
+                    emptyState.classList.add('hidden');
+                    
+                    result.data.forEach(income => {
+                        const row = `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    ${getMonthName(income.month)} ${income.year}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    ${income.source}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900 text-right font-semibold">
+                                    $${parseFloat(income.amount).toFixed(2)}
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick="deleteIncome(${income.income_id})" 
+                                            class="text-rose-600 hover:text-rose-800 font-medium">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    tableBody.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading income:', error);
+                showMessage('Error loading income data', 'error');
+            }
+        }
+
+        // Delete income
+        async function deleteIncome(incomeId) {
+            if (!confirm('Are you sure you want to delete this income entry?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/dashboard/delete-income/', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ income_id: incomeId })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showMessage('Income deleted successfully!', 'success');
+                    loadIncomeData(); // Reload the table
+                } else {
+                    showMessage('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting income', 'error');
+            }
+        }
+
+        // Helper function to get month name
+        function getMonthName(month) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[month - 1];
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `mb-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+            messageDiv.textContent = text;
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Load data on page load
+        loadIncomeData();
+    </script>
+</body>
+</html>
