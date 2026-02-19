@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .db_utils import execute_query
@@ -11,7 +12,7 @@ def add_income(request):
         try:
             data=json.loads(request.body)
 
-            user_id = data.get('user_id')
+            user_id = request.session.get('user_id')
             month = data.get('month')
             year = data.get('year')
             amount = data.get('amount')
@@ -128,7 +129,7 @@ def add_expense(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            user_id = data.get('user_id')
+            user_id = request.session.get('user_id')
             month = data.get('month')
             year = data.get('year')
             amount = data.get('amount')
@@ -224,9 +225,12 @@ def delete_expense(request):
         try:
             data = json.loads(request.body)
             expense_id = data.get('expense_id')
+            user_id = request.session.get('user_id')
+            if not user_id:
+                return redirect("users:login")
             
             query = "DELETE FROM expenses WHERE expense_id = %s"
-            params = (expense_id,)
+            params = (expense_id)
             
             execute_query(query, params, fetch=False)
             
@@ -250,7 +254,7 @@ def calculate_savings(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            user_id = data.get('user_id')
+            user_id = request.session.get('user_id')
             month = data.get('month')
             year = data.get('year')
             

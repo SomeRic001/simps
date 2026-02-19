@@ -9,14 +9,14 @@ import bcrypt as bcrypt
 def landing(request):
     user_id = request.session.get('user_id')
     if user_id:
-       return redirect ("portfolio:index")
+       return redirect ("dashboard:dashboard_home")
     return render(request, 'user/landing.html')
 
 def login(request):
     errors =[]
     user_id = request.session.get('user_id')
     if user_id:
-       return redirect ("portfolio:index")
+       return redirect ("dashboard:dashboard_home")
     if (request.method == 'POST'):
         identifier = request.POST.get('Email')
         login_pw = request.POST.get('Password')
@@ -40,14 +40,14 @@ def login(request):
             request.session.set_expiry(0)
         
         #redirect to dashboard
-        return redirect("portfolio:index")
+        return redirect("dashboard:dashboard_home")
     return render(request,"user/login.html")
 
 def signup(request):
     errors=[]
     user_id = request.session.get('user_id')
     if user_id:
-       return redirect ("portfolio:index")
+       return redirect ("dashboard:dashboard_home")
     if (request.method == 'POST'):
         full_name = request.POST.get('Full_Name')
         username = request.POST.get('Username','').strip()
