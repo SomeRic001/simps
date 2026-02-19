@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Savings - SIMPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-600">SIMPS</h1>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'dashboard_home' %}" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Dashboard
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Explore
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition font-medium">
+                        Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Savings History</h1>
+            <button onclick="calculateCurrentSavings()" 
+                    class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
+                <i class="fas fa-calculator mr-2"></i>
+                Calculate This Month's Savings
+            </button>
+        </div>
+
+        <!-- Message Div -->
+        <div id="message" class="hidden mb-4 p-4 rounded-lg"></div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white shadow-lg rounded-xl p-6">
+                <p class="text-gray-600 text-sm mb-2">Total Income (All Time)</p>
+                <p id="totalIncome" class="text-3xl font-bold text-emerald-600">$0.00</p>
+            </div>
+            <div class="bg-white shadow-lg rounded-xl p-6">
+                <p class="text-gray-600 text-sm mb-2">Total Expenses (All Time)</p>
+                <p id="totalExpenses" class="text-3xl font-bold text-rose-600">$0.00</p>
+            </div>
+            <div class="bg-white shadow-lg rounded-xl p-6">
+                <p class="text-gray-600 text-sm mb-2">Total Savings (All Time)</p>
+                <p id="totalSavings" class="text-3xl font-bold text-indigo-600">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Savings Table -->
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+            <div class="px-6 py-4 bg-indigo-100 border-b">
+                <h2 class="text-xl font-bold text-gray-900">Monthly Breakdown</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                            <th class="px-6 py-3 text-right text-sm font-semibold text-gray-900">Income</th>
+                            <th class="px-6 py-3 text-right text-sm font-semibold text-gray-900">Expenses</th>
+                            <th class="px-6 py-3 text-right text-sm font-semibold text-gray-900">Savings</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="savingsTableBody" class="divide-y divide-gray-200">
+                        <!-- Savings rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-8 text-center text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-4"></i>
+                <p>No savings records found. Add income and expenses, then calculate savings!</p>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="{% url 'dashboard_home' %}" 
+           class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mt-6">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <script>
+        // Fetch and display savings data
+        async function loadSavingsData() {
+            try {
+                const response = await fetch('/dashboard/get-savings/?user_id=1');
+                const result = await response.json();
+                
+                const tableBody = document.getElementById('savingsTableBody');
+                const emptyState = document.getElementById('emptyState');
+                
+                if (result.status === 'success' && result.data.length > 0) {
+                    tableBody.innerHTML = '';
+                    emptyState.classList.add('hidden');
+                    
+                    let totalIncome = 0;
+                    let totalExpenses = 0;
+                    let totalSavings = 0;
+                    
+                    result.data.forEach(saving => {
+                        totalIncome += parseFloat(saving.total_income);
+                        totalExpenses += parseFloat(saving.total_expenses);
+                        totalSavings += parseFloat(saving.savings_amount);
+                        
+                        const savingsAmount = parseFloat(saving.savings_amount);
+                        const statusColor = savingsAmount >= 0 ? 'text-emerald-600' : 'text-rose-600';
+                        const statusIcon = savingsAmount >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                        const statusText = savingsAmount >= 0 ? 'Surplus' : 'Deficit';
+                        
+                        const row = `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">
+                                    ${getMonthName(saving.month)} ${saving.year}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-emerald-600 text-right font-semibold">
+                                    $${parseFloat(saving.total_income).toFixed(2)}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-rose-600 text-right font-semibold">
+                                    $${parseFloat(saving.total_expenses).toFixed(2)}
+                                </td>
+                                <td class="px-6 py-4 text-sm ${statusColor} text-right font-bold">
+                                    $${Math.abs(savingsAmount).toFixed(2)}
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="${statusColor} font-medium">
+                                        <i class="fas ${statusIcon}"></i> ${statusText}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                    
+                    // Update summary cards
+                    document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
+                    document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
+                    document.getElementById('totalSavings').textContent = `$${totalSavings.toFixed(2)}`;
+                } else {
+                    tableBody.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading savings:', error);
+                showMessage('Error loading savings data', 'error');
+            }
+        }
+
+        // Calculate savings for current month
+        async function calculateCurrentSavings() {
+            const currentDate = new Date();
+            const month = currentDate.getMonth() + 1;
+            const year = currentDate.getFullYear();
+            
+            try {
+                const response = await fetch('/dashboard/calculate-savings/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: 1,
+                        month: month,
+                        year: year
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showMessage(`Savings calculated! Income: $${result.data.total_income.toFixed(2)}, Expenses: $${result.data.total_expenses.toFixed(2)}, Savings: $${result.data.savings_amount.toFixed(2)}`, 'success');
+                    loadSavingsData(); // Reload the table
+                } else {
+                    showMessage('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error calculating savings', 'error');
+            }
+        }
+
+        // Helper function to get month name
+        function getMonthName(month) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[month - 1];
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `mb-4 p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+            messageDiv.textContent = text;
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Load data on page load
+        loadSavingsData();
+    </script>
+</body>
+</html>

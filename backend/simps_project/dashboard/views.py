@@ -344,9 +344,21 @@ def get_savings(request):
             
 
 def dashboard_home(request):
-    """Display the dashboard home page"""
     return render(request, 'dashboard/dashboard.html')
 
+
 def add_income_page(request):
-    """Display the add income form page"""
     return render(request, 'dashboard/add_income.html')
+
+
+def add_expense_page(request):
+    return render(request, 'dashboard/add_expense.html')
+
+def view_income_page(request):
+    return render(request, 'dashboard/view_income.html')
+
+def view_expenses_page(request):
+    return render(request, 'dashboard/view_expenses.html')
+
+def view_savings_page(request):
+    return render(request, 'dashboard/view_savings.html')
