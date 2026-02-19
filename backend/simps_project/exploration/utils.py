@@ -29,7 +29,7 @@ def get_next_equity(user_id):
                 FROM Personal_Portfolio
                 WHERE user_id = %s
             )
-            ORDER BY RAND()
+            ORDER BY RANDOM()
             LIMIT 1
         """, [user_id])
 

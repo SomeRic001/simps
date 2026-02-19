@@ -63,7 +63,6 @@
         e.preventDefault();
         const formData = new FormData(this);
         const data = {
-            user_id: 1, 
             month: parseInt(formData.get('month')),
             year: parseInt(formData.get('year')),
             amount: parseFloat(formData.get('amount')),

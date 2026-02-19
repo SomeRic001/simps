@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -79,12 +81,16 @@ WSGI_APPLICATION = 'simps_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'simps',
-        'USER': 'root',
-        'PASSWORD':'root123@', # mylocal root password for now
-        'HOST':'localhost',
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD':os.getenv('SUPABASE_DB_PASSWORD'), # mylocal root password for now
+        'HOST':'db.qweqnmvwzivyeoyyzgzy.supabase.co',
+        'PORT':'5432',
+        'CONN_MAX_AGE':600,
+        'OPTIONS':{
+            'sslmode':'require',
+        },
     }
 }
 
