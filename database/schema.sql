@@ -7,13 +7,14 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE
 );
 
+-- increase the length for strings
 CREATE TABLE IF NOT EXISTS Global_Equities(
     equity_id INT PRIMARY KEY AUTO_INCREMENT,
-    symbol VARCHAR(10) UNIQUE NOT NULL,
+    symbol VARCHAR(30) UNIQUE NOT NULL,
     equity_name VARCHAR(255) NOT NULL,
-    type VARCHAR(20),
+    type VARCHAR(255),
     current_price DECIMAL(12, 4),
-    sector VARCHAR(100),
+    sector VARCHAR(255),
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

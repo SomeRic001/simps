@@ -122,8 +122,7 @@ def update_prices():
                     ''', [price,equity_id])
 
                     cursor.execute(''' INSERT INTO Equity_Price_History (equity_id, price)
-                                VALUES (%s,%s)
-                    ''',[equity_id,price])
+                VALUES (%s, %s) ''', [equity_id, price])
 
                 except Exception as e:
                     print(e)
