@@ -40,14 +40,16 @@ def buy_equity(request):
     amount = request.POST.get("amount")
 
     if not user_id or not equity_id or not amount:
-        return JsonResponse({"error": "Invalid request"}, status=400)
+        return JsonResponse({"error": "Invalid request parameters"}, status=400)
 
     result = process_purchase(user_id, equity_id, amount)
 
     if "error" in result:
-        return JsonResponse(result, status=400)
+        # alert if error
+        return JsonResponse({"error": result["error"]}, status=400)
 
-    return redirect("explore:home")
+    # Return success JSON so the JS knows to refresh/redirect
+    return JsonResponse({"status": "success", "message": "Purchase successful"})
 
 # if user skips the current equity
 def skip_equity(request):

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-
     const slider = document.querySelector(".amountSlider");
     const amountValue = document.querySelector(".amountValue");
     const buyBtn = document.getElementById("buyBtn");
@@ -33,5 +32,4 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.reload();
         });
     });
-
 });
