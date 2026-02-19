@@ -3,20 +3,17 @@
 
 {% block title %}Explore Equities - SIMPS{% endblock %}
 {% block content %}
-
-<body class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
+<div class="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-100">
 
 {% if no_more %}
     <div class="bg-white p-8 rounded-2xl shadow-xl text-center">
-        <h2 class="text-2xl font-bold">No More Equities </h2>
+        <h2 class="text-2xl font-bold">No More Equities</h2>
         <p class="text-gray-500 mt-2">You’ve explored everything.</p>
     </div>
 {% else %}
 
 <div class="w-96">
-
-    <div class="card bg-white rounded-2xl shadow-xl p-6">
-
+    <div class="card bg-white rounded-2xl shadow-xl p-8">
         <h2 class="text-2xl font-bold">{{ name }}</h2>
         <p class="text-gray-500">{{ symbol }}</p>
         <p class="mt-2 text-lg">${{ price }}</p>
@@ -46,19 +43,16 @@
             </button>
         </div>
 
-        <!-- Hidden form just for CSRF -->
         <form id="buyForm" method="POST" action="{% url 'explore:buy_equity' %}">
             {% csrf_token %}
             <input type="hidden" name="equity_id" value="{{ equity_id }}">
             <input type="hidden" name="amount" id="hiddenAmount">
         </form>
-
     </div>
-
 </div>
 
 {% endif %}
-{% endblock %}
+</div> {% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static 'exploration/explore.js' %}"></script>
