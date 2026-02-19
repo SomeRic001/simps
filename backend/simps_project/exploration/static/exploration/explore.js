@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const skipBtn = document.getElementById("skipBtn");
     const hiddenAmount = document.getElementById("hiddenAmount");
     const form = document.getElementById("buyForm");
+    const card = document.querySelector(".card");
+
 
     if (!slider) return;
 
